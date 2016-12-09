@@ -16,4 +16,5 @@ trait KVBulkCollection[K, V] {
   def join[B, C <: KVBulkCollection[K,B]](b: C): KVBulkCollection[K, (V, B)]
   def union(b: KVBulkCollection[K, V]): KVBulkCollection[K, V]
   def collect: Seq[(K,V)]
+  def size: Long
 }

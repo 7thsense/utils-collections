@@ -13,4 +13,6 @@ case class SparkBulkCollection[T](underlying: RDD[T])(implicit tCt: ClassTag[T])
 
   override def mapWithKey[K](op: (T) ⇒ K)(implicit kCt: ClassTag[K]) =
     SparkBulkKVCollection[K, T](underlying.map(t ⇒ (op(t), t)))
+
+  override def size: Long = ???
 }

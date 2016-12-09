@@ -30,4 +30,6 @@ case class SparkBulkKVCollection[K, V](underlying: RDD[(K, V)])(implicit kCt: Cl
   override def collect: Seq[(K, V)] = ???
 
   override def union(b: KVBulkCollection[K, V]): KVBulkCollection[K, V] = ???
+
+  override def size: Long = ???
 }

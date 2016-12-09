@@ -9,4 +9,5 @@ import scala.reflect.ClassTag
 trait BulkCollection[T] {
   def collect: Seq[T]
   def mapWithKey[K](op: (T) => K)(implicit kCt: ClassTag[K]): KVBulkCollection[K, T]
+  def size: Long
 }

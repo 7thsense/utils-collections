@@ -13,4 +13,6 @@ case class StdLibBulkCollection[T](underlying: Seq[T]) extends BulkCollection[T]
 
   override def mapWithKey[K](op: (T) ⇒ K)(implicit kCt: ClassTag[K]) =
     StdLibKVBulkCollection(underlying.map(t ⇒ (op(t), t)))
+
+  override def size: Long = this.underlying.size
 }

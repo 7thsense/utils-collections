@@ -43,4 +43,6 @@ case class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)]) extends KVBulkC
   override def collect: Seq[(K, V)] = underlying
 
   override def union(b: KVBulkCollection[K, V]): KVBulkCollection[K, V] = StdLibKVBulkCollection(this.collect ++ b.collect)
+
+  override def size: Long = this.underlying.size
 }
