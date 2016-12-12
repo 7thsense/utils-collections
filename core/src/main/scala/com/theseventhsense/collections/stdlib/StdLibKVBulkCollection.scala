@@ -19,16 +19,19 @@ case class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)]) extends KVBulkC
     StdLibKVBulkCollection(folded.toSeq)
   }
 
+  override def filter(op: (K, V) ⇒ Boolean): KVBulkCollection[K, V] =
+    StdLibKVBulkCollection(underlying.filter { case (k, v) ⇒ op(k, v) })
+
   override def flatMap[A, B](op: (K, V) ⇒ GenTraversableOnce[(A, B)]): StdLibKVBulkCollection[A, B] =
     StdLibKVBulkCollection(underlying.flatMap { case (k, v) ⇒ op(k, v) })
 
-  override def map[A, B](op: (K, V) ⇒ (A, B)): StdLibKVBulkCollection[A,B] =
+  override def map[A, B](op: (K, V) ⇒ (A, B)): StdLibKVBulkCollection[A, B] =
     StdLibKVBulkCollection(underlying.map { case (k, v) ⇒ op(k, v) })
 
   override def mapValues[T](op: (V) ⇒ (T)): StdLibKVBulkCollection[K, T] =
     StdLibKVBulkCollection(underlying.map { case (k, v) ⇒ (k, op(v)) })
 
-  override def join[B, C <: KVBulkCollection[K, B]](b: C): KVBulkCollection[K, (V, B)] = {
+  override def innerJoin[B, C <: KVBulkCollection[K, B]](b: C): KVBulkCollection[K, (V, B)] = {
     val aMap       = this.collect
     val bMap       = b.collect
     val mergedKeys = (this.keys.collect ++ b.keys.collect).toSet
@@ -40,9 +43,20 @@ case class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)]) extends KVBulkC
     StdLibKVBulkCollection(joined.toSeq)
   }
 
+  override def leftJoin[B, C <: KVBulkCollection[K, B]](b: C): KVBulkCollection[K, (V, Option[B])] = {
+    val aMap = this.collect
+    val bMap = b.collect
+    val joined = aMap.map {
+      case (k, v) ⇒
+        (k, (v, bMap.find(_._1 == k).map(_._2)))
+    }
+    StdLibKVBulkCollection(joined)
+  }
+
   override def collect: Seq[(K, V)] = underlying
 
-  override def union(b: KVBulkCollection[K, V]): KVBulkCollection[K, V] = StdLibKVBulkCollection(this.collect ++ b.collect)
+  override def union(b: KVBulkCollection[K, V]): KVBulkCollection[K, V] =
+    StdLibKVBulkCollection(this.collect ++ b.collect)
 
   override def size: Long = this.underlying.size
 }

@@ -11,9 +11,11 @@ trait KVBulkCollection[K, V] {
   def values: BulkCollection[V]
   def foldByKey[T](zero: T)(op: (T, V) => T): KVBulkCollection[K, T]
   def flatMap[A, B](op: (K, V) ⇒ GenTraversableOnce[(A, B)]): KVBulkCollection[A,B]
+  def filter(op: (K, V) => Boolean): KVBulkCollection[K,V]
   def map[A, B](op: (K, V) ⇒ (A, B)): KVBulkCollection[A,B]
   def mapValues[T](op: (V) ⇒ (T)): KVBulkCollection[K, T]
-  def join[B, C <: KVBulkCollection[K,B]](b: C): KVBulkCollection[K, (V, B)]
+  def innerJoin[B, C <: KVBulkCollection[K,B]](b: C): KVBulkCollection[K, (V, B)]
+  def leftJoin[B, C <: KVBulkCollection[K,B]](b: C): KVBulkCollection[K, (V, Option[B])]
   def union(b: KVBulkCollection[K, V]): KVBulkCollection[K, V]
   def collect: Seq[(K,V)]
   def size: Long

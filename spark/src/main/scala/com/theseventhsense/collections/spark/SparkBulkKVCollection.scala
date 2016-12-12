@@ -21,15 +21,19 @@ case class SparkBulkKVCollection[K, V](underlying: RDD[(K, V)])(implicit kCt: Cl
 
   override def flatMap[A, B](op: (K, V) => GenTraversableOnce[(A, B)]): KVBulkCollection[A, B] = ???
 
+  override def filter(op: (K, V) => Boolean): KVBulkCollection[K, V] = ???
+
   override def map[A, B](op: (K, V) => (A, B)): KVBulkCollection[A, B] = ???
 
   override def mapValues[T](op: (V) => T): KVBulkCollection[K, T] = ???
 
-  override def join[B, C <: KVBulkCollection[K, B]](b: C): KVBulkCollection[K, (V, B)] = ???
+  override def innerJoin[B, C <: KVBulkCollection[K, B]](b: C): KVBulkCollection[K, (V, B)] = ???
 
   override def collect: Seq[(K, V)] = ???
 
   override def union(b: KVBulkCollection[K, V]): KVBulkCollection[K, V] = ???
 
   override def size: Long = ???
+
+  override def leftJoin[B, C <: KVBulkCollection[K, B]](b: C): KVBulkCollection[K, (V, Option[B])] = ???
 }
