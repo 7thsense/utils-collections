@@ -3,6 +3,7 @@ package com.theseventhsense.collections.stdlib
 import com.theseventhsense.collections.KVBulkCollection
 
 import scala.collection.GenTraversableOnce
+import scala.reflect.ClassTag
 
 /**
   * Created by erik on 12/8/16.
@@ -13,25 +14,27 @@ case class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)]) extends KVBulkC
   override def keys   = StdLibBulkCollection(underlying.map(_._1))
   override def values = StdLibBulkCollection(underlying.map(_._2))
 
-  override def foldByKey[A](initial: A)(op: (A, V) ⇒ A): StdLibKVBulkCollection[K, A] = {
-    def keyOp(a: A, i: (K, V)): A = op(a, i._2)
-    val folded                    = underlying.groupBy(_._1).map { case (k, vs) ⇒ (k, vs.foldLeft(initial)(keyOp)) }
+  override def foldByKey[T: ClassTag](zero: T)(aggOp: (T, V) => T, combOp: (T, T) => T): KVBulkCollection[K, T] = {
+    def keyOp(a: T, i: (K, V)): T = aggOp(a, i._2)
+    val folded                    = underlying
+      .groupBy(_._1)
+      .map { case (k, vs) ⇒ (k, vs.foldLeft(zero)(keyOp)) }
     StdLibKVBulkCollection(folded.toSeq)
   }
 
   override def filter(op: (K, V) ⇒ Boolean): KVBulkCollection[K, V] =
     StdLibKVBulkCollection(underlying.filter { case (k, v) ⇒ op(k, v) })
 
-  override def flatMap[A, B](op: (K, V) ⇒ GenTraversableOnce[(A, B)]): StdLibKVBulkCollection[A, B] =
+  override def flatMap[A, B](op: (K, V) ⇒ TraversableOnce[(A, B)])(implicit aCt: ClassTag[A], bCt: ClassTag[B]): StdLibKVBulkCollection[A, B] =
     StdLibKVBulkCollection(underlying.flatMap { case (k, v) ⇒ op(k, v) })
 
-  override def map[A, B](op: (K, V) ⇒ (A, B)): StdLibKVBulkCollection[A, B] =
+  override def mapKV[A, B](op: (K, V) ⇒ (A, B))(implicit aCt: ClassTag[A], bCt: ClassTag[B]): StdLibKVBulkCollection[A, B] =
     StdLibKVBulkCollection(underlying.map { case (k, v) ⇒ op(k, v) })
 
-  override def mapValues[T](op: (V) ⇒ (T)): StdLibKVBulkCollection[K, T] =
+  override def mapValues[T](op: (V) ⇒ (T))(implicit tCt: ClassTag[T]): StdLibKVBulkCollection[K, T] =
     StdLibKVBulkCollection(underlying.map { case (k, v) ⇒ (k, op(v)) })
 
-  override def innerJoin[B, C <: KVBulkCollection[K, B]](b: C): KVBulkCollection[K, (V, B)] = {
+  override def innerJoin[B, C <: KVBulkCollection[K, B]](b: C)(implicit bCt: ClassTag[B]): KVBulkCollection[K, (V, B)] = {
     val aMap       = this.collect
     val bMap       = b.collect
     val mergedKeys = (this.keys.collect ++ b.keys.collect).toSet
@@ -43,7 +46,7 @@ case class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)]) extends KVBulkC
     StdLibKVBulkCollection(joined.toSeq)
   }
 
-  override def leftJoin[B, C <: KVBulkCollection[K, B]](b: C): KVBulkCollection[K, (V, Option[B])] = {
+  override def leftOuterJoin[B, C <: KVBulkCollection[K, B]](b: C)(implicit bCt: ClassTag[B]): KVBulkCollection[K, (V, Option[B])] = {
     val aMap = this.collect
     val bMap = b.collect
     val joined = aMap.map {
