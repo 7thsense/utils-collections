@@ -26,4 +26,6 @@ case class StdLibBulkCollection[T](underlying: Seq[T]) extends BulkCollection[T]
   override def size: Long = this.underlying.size
 
   override def filter(op: (T) ⇒ Boolean): BulkCollection[T] = StdLibBulkCollection(this.underlying.filter(op))
+
+  override def count(op: (T) => Boolean): Long = this.underlying.count(op)
 }

@@ -30,4 +30,5 @@ case class SparkBulkCollection[T](underlying: RDD[T])(implicit tCt: ClassTag[T],
 
   override def filter(op: (T) ⇒ Boolean): BulkCollection[T] = SparkBulkCollection(underlying.filter(op))
 
+  override def count(op: (T) => Boolean): Long = underlying.filter(op).count()
 }
