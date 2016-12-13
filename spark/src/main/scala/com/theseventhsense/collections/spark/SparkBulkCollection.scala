@@ -16,8 +16,12 @@ case class SparkBulkCollection[T](underlying: RDD[T])(implicit tCt: ClassTag[T],
   override def map[V](op: (T) ⇒ V)(implicit vCt: ClassTag[V]): BulkCollection[V] =
     SparkBulkCollection(underlying.map(op))
 
-  override def flatMap[U](op: (T) ⇒ TraversableOnce[U])(implicit vCt: ClassTag[U]): BulkCollection[U] =
+  override def flatMap[U](op: (T) ⇒ TraversableOnce[U])(implicit uCt: ClassTag[U]): BulkCollection[U] =
     SparkBulkCollection(underlying.flatMap(op))
+
+  override def aggregate[U](zero: U)(seqOp: (U, T) => U, combOp: (U, U) => U)(implicit uCt: ClassTag[U]): U =
+    underlying.aggregate(zero)(seqOp, combOp)
+
 
   override def mapWithKey[K](op: (T) ⇒ K)(implicit kCt: ClassTag[K]) =
     SparkBulkKVCollection[K, T](underlying.map(t ⇒ (op(t), t)))
