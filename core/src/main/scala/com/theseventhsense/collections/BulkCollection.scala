@@ -8,6 +8,9 @@ import scala.reflect.ClassTag
 
 trait BulkCollection[T] {
   def collect: Seq[T]
+  def map[V](op: (T) => V)(implicit vCt: ClassTag[V]): BulkCollection[V]
   def mapWithKey[K](op: (T) => K)(implicit kCt: ClassTag[K]): KVBulkCollection[K, T]
   def size: Long
+  def filter(op: (T) => Boolean): BulkCollection[T]
+
 }

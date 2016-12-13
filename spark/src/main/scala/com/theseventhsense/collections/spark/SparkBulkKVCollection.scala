@@ -15,7 +15,7 @@ case class SparkBulkKVCollection[K, V](underlying: RDD[(K, V)])(implicit kCt: Cl
 
   override def keys: BulkCollection[K] = SparkBulkCollection(underlying.map(_._1))
 
-  override def foldByKey[T: ClassTag](zero: T)(aggOp: (T, V) ⇒ T, combOp: (T, T) ⇒ T): KVBulkCollection[K, T] =
+  override def foldByKey[T](zero: T)(aggOp: (T, V) ⇒ T, combOp: (T, T) ⇒ T)(implicit tCt: ClassTag[T]): KVBulkCollection[K, T] =
     SparkBulkKVCollection(underlying.aggregateByKey(zero)(aggOp, combOp))
 
   override def flatMap[A, B](op: (K, V) ⇒ TraversableOnce[(A, B)])(implicit aCt: ClassTag[A], bCt: ClassTag[B]): KVBulkCollection[A, B] =

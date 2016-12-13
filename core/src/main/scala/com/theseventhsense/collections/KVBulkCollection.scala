@@ -10,7 +10,7 @@ trait KVBulkCollection[K, V] {
   def sorted(implicit ordering: Ordering[K]): KVBulkCollection[K, V]
   def keys: BulkCollection[K]
   def values: BulkCollection[V]
-  def foldByKey[T: ClassTag](zero: T)(aggOp: (T, V) => T, combOp: (T, T) => T): KVBulkCollection[K, T]
+  def foldByKey[T](zero: T)(aggOp: (T, V) => T, combOp: (T, T) => T)(implicit tCt: ClassTag[T]): KVBulkCollection[K, T]
   def flatMap[A, B](op: (K, V) ⇒ TraversableOnce[(A, B)])(implicit aCt: ClassTag[A], bCt: ClassTag[B]): KVBulkCollection[A,B]
   def filter(op: (K, V) => Boolean): KVBulkCollection[K,V]
   def mapKV[A, B](op: (K, V) ⇒ (A, B))(implicit aCt: ClassTag[A], bCt: ClassTag[B]): KVBulkCollection[A,B]

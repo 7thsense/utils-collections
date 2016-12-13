@@ -15,7 +15,10 @@ case class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)]) extends KVBulkC
   override def values = StdLibBulkCollection(underlying.map(_._2))
 
   override def foldByKey[T: ClassTag](zero: T)(aggOp: (T, V) => T, combOp: (T, T) => T): KVBulkCollection[K, T] = {
-    def keyOp(a: T, i: (K, V)): T = aggOp(a, i._2)
+    def keyOp(a: T, i: (K, V)): T = {
+      implicit val key = i._1
+      aggOp(a, i._2)
+    }
     val folded                    = underlying
       .groupBy(_._1)
       .map { case (k, vs) ⇒ (k, vs.foldLeft(zero)(keyOp)) }
