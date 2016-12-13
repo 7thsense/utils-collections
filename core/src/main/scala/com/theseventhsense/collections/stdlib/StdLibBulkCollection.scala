@@ -14,6 +14,9 @@ case class StdLibBulkCollection[T](underlying: Seq[T]) extends BulkCollection[T]
   override def map[V](op: (T) ⇒ V)(implicit vCt: ClassTag[V]): BulkCollection[V] =
     StdLibBulkCollection(underlying.map(op))
 
+  override def flatMap[U](op: (T) ⇒ TraversableOnce[U])(implicit vCt: ClassTag[U]): BulkCollection[U] =
+    StdLibBulkCollection(underlying.flatMap(op))
+
   override def mapWithKey[K](op: (T) ⇒ K)(implicit kCt: ClassTag[K]) =
     StdLibKVBulkCollection(underlying.map(t ⇒ (op(t), t)))
 
