@@ -1,12 +1,11 @@
 package com.theseventhsense.collections
 
-import scala.collection.GenTraversableOnce
 import scala.reflect.ClassTag
 
 /**
   * Created by erik on 12/8/16.
   */
-trait KVBulkCollection[K, V] {
+trait KVBulkCollection[K, V] extends BulkCollection[(K, V)] {
   def sorted(implicit ordering: Ordering[K]): KVBulkCollection[K, V]
   def keys: BulkCollection[K]
   def values: BulkCollection[V]
