@@ -1,16 +1,30 @@
-//import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt._
 
 object Dependencies {
   object Versions {
-    val Cats = "0.8.0"
+    val Akka = "2.4.11"
+    val Cats = "0.7.2"
+    val Circe = "0.5.2"
     val MapDB = "1.0.9"
     val ScalaTest = "3.0.0"
     val Spark = "2.0.1"
   }
 
+  val Akka = Def.setting(Seq(
+    "com.typesafe.akka" %% "akka-actor" % Versions.Akka,
+    "com.typesafe.akka" %% "akka-stream" % Versions.Akka,
+    "com.typesafe.akka" %% "akka-slf4j" % Versions.Akka
+  ))
+
   val Cats = Def.setting(Seq(
     "org.typelevel" %% "cats" % Versions.Cats
+  ))
+
+  val Circe = Def.setting(Seq(
+    "io.circe" %%% "circe-core" % Versions.Circe,
+    "io.circe" %%% "circe-generic" % Versions.Circe,
+    "io.circe" %%% "circe-parser" % Versions.Circe
   ))
 
   val MapDB = Def.setting(Seq(
@@ -18,7 +32,7 @@ object Dependencies {
   ))
 
   val ScalaTest = Def.setting(Seq(
-    "org.scalatest" %% "scalatest" % Versions.ScalaTest % "test"
+    "org.scalatest" %%% "scalatest" % Versions.ScalaTest % "test"
   ))
 
   val Spark = Def.setting(Seq(
