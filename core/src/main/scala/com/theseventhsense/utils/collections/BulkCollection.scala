@@ -15,4 +15,5 @@ trait BulkCollection[T] extends Serializable {
   def size: Long
   def filter(op: (T) => Boolean): BulkCollection[T]
   def count(op: (T) => Boolean): Long
+  def persist(): Unit = ()
 }

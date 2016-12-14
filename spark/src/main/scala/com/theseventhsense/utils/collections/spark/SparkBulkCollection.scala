@@ -34,6 +34,8 @@ class SparkBulkCollection[T](_underlying: RDD[T])(implicit tCt: ClassTag[T], spa
 
   override def count(op: (T) ⇒ Boolean): Long = underlying.filter(op).count()
 
+  override def persist(): Unit = _underlying.persist()
+
   def underlying: RDD[T] = _underlying
 }
 
