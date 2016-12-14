@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
   * Created by erik on 9/15/16.
   */
 
-trait BulkCollection[T] {
+trait BulkCollection[T] extends Serializable {
   def collect: Seq[T]
   def map[V](op: (T) => V)(implicit vCt: ClassTag[V]): BulkCollection[V]
   def flatMap[U](op: (T) ⇒ TraversableOnce[U])(implicit vCt: ClassTag[U]): BulkCollection[U]
@@ -15,5 +15,4 @@ trait BulkCollection[T] {
   def size: Long
   def filter(op: (T) => Boolean): BulkCollection[T]
   def count(op: (T) => Boolean): Long
-
 }
