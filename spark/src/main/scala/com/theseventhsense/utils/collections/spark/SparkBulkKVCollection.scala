@@ -1,6 +1,6 @@
-package com.theseventhsense.collections.spark
+package com.theseventhsense.utils.collections.spark
 
-import com.theseventhsense.collections.{BulkCollection, KVBulkCollection}
+import com.theseventhsense.utils.collections.{BulkCollection, KVBulkCollection}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 

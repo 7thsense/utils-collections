@@ -5,7 +5,7 @@ val scala210Version = "2.10.5"
 val CommonSettings = Seq(
   organization := "com.theseventhsense",
 //  version := "0.1.1-SNAPSHOT",
-  version := "0.1.2",
+  version := "0.1.3",
 //  isSnapshot := true,
   publishMavenStyle := true,
   bintrayOrganization := Some("7thsense"),
@@ -20,8 +20,8 @@ lazy val root = project
   .settings(name := "utils-collections-all")
   .settings(libraryDependencies ++=  Dependencies.ScalaTest.value)
   .settings(libraryDependencies ++=  Dependencies.Spark.value)
-  .dependsOn(core.jvm, spark)
-  .aggregate(core.jvm, core.js, spark)
+  .dependsOn(core.jvm, spark, mapdb)
+  .aggregate(core.jvm, core.js, spark, mapdb)
 
 lazy val core = crossProject.crossType(CrossType.Pure)
   .in(file("./core"))
@@ -38,5 +38,13 @@ lazy val spark = project
   .settings(name := "utils-collections-spark")
   .settings(CommonSettings)
   .settings(libraryDependencies ++=  Dependencies.Spark.value)
+
+lazy val mapdb = project
+  .in(file("./mapdb"))
+  .dependsOn(core.jvm)
+  .settings(name := "utils-collections-mapdb")
+  .settings(CommonSettings)
+  .settings(libraryDependencies ++=  Dependencies.MapDB.value)
+  .settings(libraryDependencies ++=  Dependencies.ScalaTest.value)
 
 initialCommands in (Test, console) := """ammonite.repl.Main.run("")"""

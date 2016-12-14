@@ -1,7 +1,8 @@
 package com.theseventhsense.collections
 
-import com.theseventhsense.collections.spark._
-import com.theseventhsense.collections.stdlib._
+import com.theseventhsense.utils.collections.spark._
+import com.theseventhsense.utils.collections.{BulkCollection, KVBulkCollection}
+import com.theseventhsense.utils.collections.stdlib._
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 import org.scalatest.{MustMatchers, WordSpec}

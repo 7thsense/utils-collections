@@ -1,4 +1,4 @@
-package com.theseventhsense.collections
+package com.theseventhsense.utils.collections
 
 import scala.reflect.ClassTag
 

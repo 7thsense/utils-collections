@@ -1,6 +1,6 @@
-package com.theseventhsense.collections.stdlib
+package com.theseventhsense.utils.collections.stdlib
 
-import com.theseventhsense.collections.BulkCollection
+import com.theseventhsense.utils.collections.BulkCollection
 
 import scala.reflect.ClassTag
 
