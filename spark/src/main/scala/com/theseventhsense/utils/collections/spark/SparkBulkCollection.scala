@@ -28,13 +28,13 @@ class SparkBulkCollection[T](_underlying: RDD[T])(implicit tCt: ClassTag[T], spa
   override def mapWithKey[K](op: (T) ⇒ K)(implicit kCt: ClassTag[K]) =
     SparkBulkKVCollection[K, T](underlying.map(t ⇒ (op(t), t)))
 
-  override def size: Long = underlying.count()
+  override lazy val size: Long = underlying.count()
 
   override def filter(op: (T) ⇒ Boolean): BulkCollection[T] = SparkBulkCollection(underlying.filter(op))
 
   override def count(op: (T) ⇒ Boolean): Long = underlying.filter(op).count()
 
-  override def persist(): Unit = _underlying.persist()
+  override def persist(): SparkBulkCollection[T] = SparkBulkCollection(_underlying.persist())
 
   def underlying: RDD[T] = _underlying
 }

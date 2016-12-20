@@ -48,8 +48,6 @@ class SparkBulkKVCollection[K, V](
       throw new Exception(s"$b is not a spark kv collection, can't union")
   }
 
-  override def size: Long = underlying.count()
-
   override def innerJoin[B, C <: KVBulkCollection[K, B]](b: C)(
       implicit bCt: ClassTag[B]): KVBulkCollection[K, (V, B)] = {
     val bRdd: RDD[(K, B)] = b match {
@@ -67,6 +65,8 @@ class SparkBulkKVCollection[K, V](
     }
     SparkBulkKVCollection(underlying.leftOuterJoin(bRdd))
   }
+
+  def persistKV(): SparkBulkKVCollection[K,V] = SparkBulkKVCollection(underlying.persist())
 }
 
 object SparkBulkKVCollection {
