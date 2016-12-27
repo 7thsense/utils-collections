@@ -28,7 +28,7 @@ class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)])
   override def filter(op: (K, V) ⇒ Boolean): KVBulkCollection[K, V] =
     StdLibKVBulkCollection(underlying.filter { case (k, v) ⇒ op(k, v) })
 
-  override def flatMap[A, B](op: (K, V) ⇒ TraversableOnce[(A, B)])(
+  override def flatMapKV[A, B](op: (K, V) ⇒ TraversableOnce[(A, B)])(
       implicit aCt: ClassTag[A],
       bCt: ClassTag[B]): StdLibKVBulkCollection[A, B] =
     StdLibKVBulkCollection(underlying.flatMap { case (k, v) ⇒ op(k, v) })
@@ -66,7 +66,7 @@ class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)])
 
   override def collect: Seq[(K, V)] = underlying
 
-  override def union(b: KVBulkCollection[K, V]): KVBulkCollection[K, V] =
+  override def unionKV(b: KVBulkCollection[K, V]): KVBulkCollection[K, V] =
     StdLibKVBulkCollection(this.collect ++ b.collect)
 
   override def size: Long = this.underlying.size

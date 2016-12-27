@@ -14,6 +14,8 @@ trait BulkCollection[T] extends Serializable {
   def mapWithKey[K](op: (T) => K)(implicit kCt: ClassTag[K]): KVBulkCollection[K, T]
   def size: Long
   def filter(op: (T) => Boolean): BulkCollection[T]
+  def distinct: BulkCollection[T]
   def count(op: (T) => Boolean): Long
   def persist(): BulkCollection[T] = this
+  def union(b: BulkCollection[T]): BulkCollection[T]
 }

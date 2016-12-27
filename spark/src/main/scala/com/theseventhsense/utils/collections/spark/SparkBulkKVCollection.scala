@@ -3,6 +3,7 @@ package com.theseventhsense.utils.collections.spark
 import com.theseventhsense.utils.collections.{BulkCollection, KVBulkCollection}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.storage.StorageLevel
 
 import scala.reflect._
 
@@ -21,8 +22,8 @@ class SparkBulkKVCollection[K, V](
       implicit tCt: ClassTag[T]): KVBulkCollection[K, T] =
     SparkBulkKVCollection(underlying.aggregateByKey(zero)(aggOp, combOp))
 
-  override def flatMap[A, B](op: (K, V) ⇒ TraversableOnce[(A, B)])(implicit aCt: ClassTag[A],
-                                                                   bCt: ClassTag[B]): KVBulkCollection[A, B] =
+  override def flatMapKV[A, B](op: (K, V) ⇒ TraversableOnce[(A, B)])(implicit aCt: ClassTag[A],
+                                                                     bCt: ClassTag[B]): KVBulkCollection[A, B] =
     SparkBulkKVCollection(underlying.flatMap { case (k, v) ⇒ op(k, v) })
 
   override def filter(op: (K, V) ⇒ Boolean): KVBulkCollection[K, V] =
@@ -40,7 +41,7 @@ class SparkBulkKVCollection[K, V](
 
   override def collect: Seq[(K, V)] = underlying.collect
 
-  override def union(b: KVBulkCollection[K, V]): KVBulkCollection[K, V] = b match {
+  override def unionKV(b: KVBulkCollection[K, V]): KVBulkCollection[K, V] = b match {
     case x: SparkBulkKVCollection[K, V] ⇒
       val rdd: RDD[(K, V)] = underlying.union(x.underlying)
       SparkBulkKVCollection.apply[K, V](rdd)
@@ -66,7 +67,7 @@ class SparkBulkKVCollection[K, V](
     SparkBulkKVCollection(underlying.leftOuterJoin(bRdd))
   }
 
-  def persistKV(): SparkBulkKVCollection[K,V] = SparkBulkKVCollection(underlying.persist())
+  def persistKV(): SparkBulkKVCollection[K,V] = SparkBulkKVCollection(underlying.persist(StorageLevel.OFF_HEAP))
 }
 
 object SparkBulkKVCollection {

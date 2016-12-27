@@ -55,7 +55,7 @@ trait BulkCollectionSpec extends WordSpec with MustMatchers {
     }
 
 
-    lazy val unioned     = amapped.union(bmapped)
+    lazy val unioned     = amapped.unionKV(bmapped)
     "union two identical collections" in {
       unioned.collect mustEqual Seq((97, "aa"), (98, "ab"), (97, "ba"), (98, "bb"))
     }

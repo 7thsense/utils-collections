@@ -3,6 +3,7 @@ package com.theseventhsense.utils.collections.spark
 import com.theseventhsense.utils.collections.BulkCollection
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.storage.StorageLevel
 
 import scala.reflect.ClassTag
 
@@ -34,7 +35,12 @@ class SparkBulkCollection[T](_underlying: RDD[T])(implicit tCt: ClassTag[T], spa
 
   override def count(op: (T) ⇒ Boolean): Long = underlying.filter(op).count()
 
-  override def persist(): SparkBulkCollection[T] = SparkBulkCollection(_underlying.persist())
+  override def distinct: BulkCollection[T] = SparkBulkCollection(underlying.distinct())
+
+  override def persist(): SparkBulkCollection[T] = SparkBulkCollection(_underlying.persist(StorageLevel.OFF_HEAP))
+
+  override def union(b: BulkCollection[T]): BulkCollection[T] =
+    SparkBulkCollection(underlying.union(b.asInstanceOf[SparkBulkCollection[T]].underlying))
 
   def underlying: RDD[T] = _underlying
 }
