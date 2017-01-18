@@ -15,8 +15,7 @@ class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)])
   override def keys   = StdLibBulkCollection(underlying.map(_._1))
   override def values = StdLibBulkCollection(underlying.map(_._2))
 
-  override def foldByKey[T: ClassTag](zero: T)(aggOp: (T, V) ⇒ T,
-                                               combOp: (T, T) ⇒ T): KVBulkCollection[K, T] = {
+  override def foldByKey[T: ClassTag](zero: T)(aggOp: (T, V) ⇒ T, combOp: (T, T) ⇒ T): KVBulkCollection[K, T] = {
     def keyOp(a: T, i: (K, V)): T = {
       implicit val key = i._1
       aggOp(a, i._2)
@@ -40,8 +39,8 @@ class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)])
   override def mapValues[T](op: (V) ⇒ (T))(implicit tCt: ClassTag[T]): StdLibKVBulkCollection[K, T] =
     StdLibKVBulkCollection(underlying.map { case (k, v) ⇒ (k, op(v)) })
 
-  override def innerJoin[B, C <: KVBulkCollection[K, B]](b: C)(
-      implicit bCt: ClassTag[B]): KVBulkCollection[K, (V, B)] = {
+  override def innerJoin[B, C <: KVBulkCollection[K, B]](
+      b: C)(implicit kOrd: Ordering[K], bCt: ClassTag[B]): KVBulkCollection[K, (V, B)] = {
     val aMap       = this.collect
     val bMap       = b.collect
     val mergedKeys = (this.keys.collect ++ b.keys.collect).toSet
@@ -53,8 +52,8 @@ class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)])
     StdLibKVBulkCollection(joined.toSeq)
   }
 
-  override def leftOuterJoin[B, C <: KVBulkCollection[K, B]](b: C)(
-      implicit bCt: ClassTag[B]): KVBulkCollection[K, (V, Option[B])] = {
+  override def leftOuterJoin[B, C <: KVBulkCollection[K, B]](
+      b: C)(implicit kOrd: Ordering[K], bCt: ClassTag[B]): KVBulkCollection[K, (V, Option[B])] = {
     val aMap = this.collect
     val bMap = b.collect
     val joined = aMap.map {
@@ -62,6 +61,10 @@ class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)])
         (k, (v, bMap.find(_._1 == k).map(_._2)))
     }
     StdLibKVBulkCollection(joined)
+  }
+
+  override def subtractByKey[T](b: KVBulkCollection[K, T])(implicit tCt: ClassTag[T]): KVBulkCollection[K, V] = {
+    StdLibKVBulkCollection(underlying.filter { case (k, v) ⇒ !b.keys.collect.contains(k) })
   }
 
   override def collect: Seq[(K, V)] = underlying
@@ -73,5 +76,5 @@ class StdLibKVBulkCollection[K, V](underlying: Seq[(K, V)])
 }
 
 object StdLibKVBulkCollection {
-  def apply[K, V](underlying: Seq[(K,V)]) = new StdLibKVBulkCollection(underlying)
+  def apply[K, V](underlying: Seq[(K, V)]) = new StdLibKVBulkCollection(underlying)
 }

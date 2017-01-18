@@ -9,6 +9,7 @@ object Dependencies {
     val MapDB = "1.0.9"
     val ScalaTest = "3.0.0"
     val Spark = "2.0.1"
+    val SparkSkewJoin = "0.4.0"
   }
 
   val Akka = Def.setting(Seq(
@@ -38,5 +39,9 @@ object Dependencies {
   val Spark = Def.setting(Seq(
     "org.apache.spark" %% "spark-core" % Versions.Spark % "provided",
     "org.apache.spark" %% "spark-sql" % Versions.Spark % "provided"
+  ))
+
+  val SparkSkewJoin = Def.setting(Seq(
+    "com.tresata" %%  "spark-skewjoin" % Versions.SparkSkewJoin
   ))
 }
