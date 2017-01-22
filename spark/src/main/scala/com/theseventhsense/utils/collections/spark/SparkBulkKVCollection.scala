@@ -4,7 +4,7 @@ import com.theseventhsense.utils.collections.{BulkCollection, KVBulkCollection}
 import com.tresata.spark.skewjoin.Dsl._
 import com.twitter.algebird.CMSHasher
 import com.twitter.algebird.CMSHasher.CMSHasherInt
-import org.apache.spark.HashPartitioner
+import org.apache.spark.{HashPartitioner, Partitioner}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
@@ -58,7 +58,7 @@ class SparkBulkKVCollection[K, V](
       case x: SparkBulkKVCollection[K, B] ⇒ x.underlying
       case _                              ⇒ spark.sparkContext.emptyRDD[(K, B)]
     }
-    val partitioner = new HashPartitioner(underlying.partitions.length)
+    val partitioner     = Partitioner.defaultPartitioner(underlying, bRdd)
     val joined      = underlying.skewJoin[B](bRdd, partitioner)
     SparkBulkKVCollection(joined)
   }
@@ -70,7 +70,7 @@ class SparkBulkKVCollection[K, V](
       case x: SparkBulkKVCollection[K, B] ⇒ x.underlying
       case _                              ⇒ spark.sparkContext.emptyRDD[(K, B)]
     }
-    val partitioner = new HashPartitioner(underlying.partitions.length)
+    val partitioner     = Partitioner.defaultPartitioner(underlying, bRdd)
     SparkBulkKVCollection(
       underlying.skewLeftOuterJoin(bRdd, partitioner))
   }
