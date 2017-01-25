@@ -53,26 +53,36 @@ class SparkBulkKVCollection[K, V](
 
   override def innerJoin[B, C <: KVBulkCollection[K, B]](
       b: C)(implicit kOrd: Ordering[K], bCt: ClassTag[B]): KVBulkCollection[K, (V, B)] = {
-    implicit val cmsHasherK: CMSHasher[K] = CMSHasherInt.contramap(x ⇒ x.hashCode())
     val bRdd: RDD[(K, B)] = b match {
       case x: SparkBulkKVCollection[K, B] ⇒ x.underlying
       case _                              ⇒ spark.sparkContext.emptyRDD[(K, B)]
     }
-    val partitioner     = Partitioner.defaultPartitioner(underlying, bRdd)
-    val joined      = underlying.skewJoin[B](bRdd, partitioner)
-    SparkBulkKVCollection(joined)
+    //    implicit val cmsHasherK: CMSHasher[K] = CMSHasherInt.contramap(x ⇒ x.hashCode())
+//    val joined = if(underlying.partitions.length > bRdd.partitions.length) {
+//      val b = bRdd.repartition(underlying.partitions.size)
+//      underlying.skewJoin[B](b, SparkBulkKVCollection.defaultPartitioner(underlying, b))
+//    } else {
+//      val u = underlying.repartition(bRdd.partitions.size)
+//      u.skewJoin[B](bRdd, SparkBulkKVCollection.defaultPartitioner(u, bRdd))
+//    }
+    SparkBulkKVCollection(underlying.join(bRdd))
   }
 
   override def leftOuterJoin[B, C <: KVBulkCollection[K, B]](
       b: C)(implicit kOrd: Ordering[K], bCt: ClassTag[B]): KVBulkCollection[K, (V, Option[B])] = {
-    implicit val cmsHasherK: CMSHasher[K] = CMSHasherInt.contramap(x ⇒ x.hashCode())
     val bRdd: RDD[(K, B)] = b match {
       case x: SparkBulkKVCollection[K, B] ⇒ x.underlying
       case _                              ⇒ spark.sparkContext.emptyRDD[(K, B)]
     }
-    val partitioner     = Partitioner.defaultPartitioner(underlying, bRdd)
-    SparkBulkKVCollection(
-      underlying.skewLeftOuterJoin(bRdd, partitioner))
+//    implicit val cmsHasherK: CMSHasher[K] = CMSHasherInt.contramap(x ⇒ x.hashCode())
+//    val joined = if(underlying.partitions.length > bRdd.partitions.length) {
+//      val b = bRdd.repartition(underlying.partitions.size)
+//      underlying.skewLeftOuterJoin(b, SparkBulkKVCollection.defaultPartitioner(underlying, b))
+//    } else {
+//      val u = underlying.repartition(bRdd.partitions.size)
+//      u.skewLeftOuterJoin(bRdd, SparkBulkKVCollection.defaultPartitioner(u, bRdd))
+//    }
+    SparkBulkKVCollection(underlying.leftOuterJoin(bRdd))
   }
 
   override def subtractByKey[T](b: KVBulkCollection[K, T])(implicit tCt: ClassTag[T]): KVBulkCollection[K, V] = {
@@ -108,4 +118,13 @@ object SparkBulkKVCollection {
       bCt: ClassTag[B],
       spark: SparkSession): KVBulkCollection[A, B] =
     SparkBulkKVCollection(underlying.map { case (k, v) ⇒ op(k, v) })
+
+  // ignore the "spark.default.partitions" setting
+  def defaultPartitioner(rdd: RDD[_], others: RDD[_]*): Partitioner = {
+    val bySize = (Seq(rdd) ++ others).sortBy(_.partitions.length).reverse
+    for (r <- bySize if r.partitioner.isDefined && r.partitioner.get.numPartitions > 0) {
+      return r.partitioner.get
+    }
+    new HashPartitioner(bySize.head.partitions.length)
+  }
 }
