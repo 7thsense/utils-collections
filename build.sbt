@@ -3,7 +3,7 @@ val scala210Version = "2.10.5"
 
 val CommonSettings = Seq(
   organization := "com.theseventhsense",
-  version := "0.1.9",
+  version := "0.1.10-SNAPSHOT",
   isSnapshot := version.value.contains("SNAPSHOT"),
   publishMavenStyle := true,
   bintrayOrganization := Some("7thsense"),
