@@ -2,6 +2,7 @@ package com.theseventhsense.utils.collections.mapdb
 
 import java.io.{ObjectInput, _}
 
+import cats.implicits._
 import com.theseventhsense.utils.collections.mapdb.MapDBOffHeapIterator.SerializerProvider
 import io.circe._
 import org.mapdb.Serializer

@@ -46,7 +46,6 @@ lazy val spark = project
   .settings(name := "utils-collections-spark")
   .settings(CommonSettings)
   .settings(libraryDependencies ++= Dependencies.Spark.value)
-  .settings(libraryDependencies ++= Dependencies.SparkSkewJoin.value)
 
 lazy val mapdb = project
   .in(file("./mapdb"))

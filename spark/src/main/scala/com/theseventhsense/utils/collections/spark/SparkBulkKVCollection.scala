@@ -1,9 +1,6 @@
 package com.theseventhsense.utils.collections.spark
 
 import com.theseventhsense.utils.collections.{BulkCollection, KVBulkCollection}
-import com.tresata.spark.skewjoin.Dsl._
-import com.twitter.algebird.CMSHasher
-import com.twitter.algebird.CMSHasher.CMSHasherInt
 import org.apache.spark.{HashPartitioner, Partitioner}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession

@@ -1,7 +1,6 @@
 package com.theseventhsense.utils.collections.spark
 
 import com.theseventhsense.utils.collections.BulkCollection
-import com.twitter.algebird.CMSHasher
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
