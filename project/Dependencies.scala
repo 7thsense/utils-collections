@@ -8,7 +8,7 @@ object Dependencies {
     val Circe = "0.7.0"
     val MapDB = "1.0.9"
     val ScalaTest = "3.0.0"
-    val Spark = "2.0.2"
+    val Spark = "2.1.0"
   }
 
   val Akka = Def.setting(Seq(
