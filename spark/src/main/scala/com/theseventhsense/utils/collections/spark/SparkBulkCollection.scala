@@ -37,7 +37,7 @@ class SparkBulkCollection[T](_underlying: RDD[T])(implicit tCt: ClassTag[T], spa
 
   override def distinct: BulkCollection[T] = SparkBulkCollection(underlying.distinct())
 
-  override def persist(): SparkBulkCollection[T] = SparkBulkCollection(_underlying.persist(StorageLevel.OFF_HEAP))
+  override def persist(): SparkBulkCollection[T] = SparkBulkCollection(_underlying.persist(StorageLevel.MEMORY_AND_DISK))
 
   override def union(b: BulkCollection[T]): BulkCollection[T] =
     SparkBulkCollection(underlying.union(b.asInstanceOf[SparkBulkCollection[T]].underlying))

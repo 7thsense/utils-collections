@@ -87,7 +87,7 @@ class SparkBulkKVCollection[K, V](
   }
 
   def persistKV(): SparkBulkKVCollection[K, V] =
-    SparkBulkKVCollection(underlying.persist(StorageLevel.OFF_HEAP))
+    SparkBulkKVCollection(underlying.persist(StorageLevel.MEMORY_AND_DISK))
 }
 
 object SparkBulkKVCollection {
