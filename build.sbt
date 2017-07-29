@@ -5,7 +5,7 @@ val scala212Version = "2.12.3"
 
 val SharedSettings = Seq(
   organization := "com.theseventhsense",
-  version := "0.1.13",
+  version := "0.1.14-SNAPSHOT",
   isSnapshot := version.value.contains("SNAPSHOT"),
   publishMavenStyle := true,
   bintrayOrganization := Some("7thsense"),
