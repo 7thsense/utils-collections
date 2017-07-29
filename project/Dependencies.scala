@@ -3,9 +3,9 @@ import sbt._
 
 object Dependencies {
   object Versions {
-    val Akka = "2.4.11"
+    val Akka = "2.5.3"
     val Cats = "0.9.0"
-    val Circe = "0.7.0"
+    val Circe = "0.8.0"
     val MapDB = "1.0.9"
     val ScalaTest = "3.0.0"
     val Spark = "2.1.0"

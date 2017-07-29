@@ -1,25 +1,30 @@
-val scala211Version = "2.11.8"
-val scala210Version = "2.10.5"
 
-val CommonSettings = Seq(
+val scala210Version = "2.10.5"
+val scala211Version = "2.11.11"
+val scala212Version = "2.12.3"
+
+val SharedSettings = Seq(
   organization := "com.theseventhsense",
   version := "0.1.13-SNAPSHOT",
   isSnapshot := version.value.contains("SNAPSHOT"),
   publishMavenStyle := true,
   bintrayOrganization := Some("7thsense"),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  //crossScalaVersions := Seq(scala211Version),
   scalaVersion := scala211Version
 )
+val CrossSettings = Seq(
+  crossScalaVersions := Seq(scala211Version, scala212Version)
+)
+
+val CommonSettings = SharedSettings ++ CrossSettings
 
 lazy val root = project
   .in(file("."))
   .settings(CommonSettings)
   .settings(name := "utils-collections-all")
   .settings(libraryDependencies ++= Dependencies.ScalaTest.value)
-  .settings(libraryDependencies ++= Dependencies.Spark.value)
-  .dependsOn(core.jvm, spark, mapdb, circe.jvm, akka)
-  .aggregate(akka, core.jvm, core.js, circe.jvm, spark, mapdb)
+  .dependsOn(core.jvm, mapdb, circe.jvm, akka)
+  .aggregate(akka, core.jvm, core.js, circe.jvm, mapdb)
 
 lazy val core = crossProject
   .crossType(CrossType.Pure)
@@ -44,7 +49,8 @@ lazy val spark = project
   .in(file("./spark"))
   .dependsOn(core.jvm)
   .settings(name := "utils-collections-spark")
-  .settings(CommonSettings)
+  .settings(crossScalaVersions := Seq(scala211Version))
+  .settings(SharedSettings)
   .settings(libraryDependencies ++= Dependencies.Spark.value)
 
 lazy val mapdb = project
@@ -55,8 +61,6 @@ lazy val mapdb = project
   .dependsOn(circe.jvm % "provided")
   .settings(libraryDependencies ++= Dependencies.MapDB.value)
   .settings(libraryDependencies ++= Dependencies.ScalaTest.value)
-
-
 
 lazy val circeJVM = circe.jvm
 
